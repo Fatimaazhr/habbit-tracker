@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0891b2',
+                        accent: '#f97316',
+                        card: '#f9fafb',
+                        muted: '#6b7280'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+        
+        /* Updated fonts to Inter and Poppins for modern look */
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        
+        /* Added gradient backgrounds and enhanced animations */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .habit-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .habit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .habit-card:hover::before {
+            left: 100%;
+        }
+        
+        .habit-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .floating-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-white to-cyan-50 font-inter min-h-screen">
+    <!-- Enhanced header with gradient background and better styling -->
+    <header class="gradient-bg shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-8">
+                <div class="text-white">
+                    <h1 class="text-4xl font-bold font-poppins mb-2 floating-animation">✨ My Habit Tracker</h1>
+                    <p class="text-indigo-100 text-lg font-medium">Build better habits, one day at a time</p>
+                </div>
+                <button id="addHabitBtn" class="btn-primary text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-3 text-lg">
+                    <i class="fas fa-plus text-xl"></i>
+                    Add New Habit
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Enhanced main dashboard with better spacing and modern cards -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white rounded-3xl p-8 shadow-xl border-0 stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-2">Total Habits</p>
+                        <p class="text-4xl font-bold text-gray-900 font-poppins" id="totalHabits">0</p>
+                    </div>
+                    <div class="gradient-card p-4 rounded-2xl">
+                        <i class="fas fa-list-check text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-3xl p-8 shadow-xl border-0 stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-2">Completed Today</p>
+                        <p class="text-4xl font-bold text-gray-900 font-poppins" id="completedToday">0</p>
+                    </div>
+                    <div class="gradient-success p-4 rounded-2xl">
+                        <i class="fas fa-check-circle text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-3xl p-8 shadow-xl border-0 stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-2">Best Streak</p>
+                        <p class="text-4xl font-bold text-gray-900 font-poppins" id="bestStreak">0</p>
+                    </div>
+                    <div class="gradient-warning p-4 rounded-2xl pulse-animation">
+                        <i class="fas fa-fire text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Habits Grid -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 font-poppins mb-8 text-center">Your Daily Habits</h2>
+            <div id="habitsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Habit cards will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Enhanced empty state with better design -->
+        <div id="emptyState" class="text-center py-16 hidden">
+            <div class="bg-white rounded-3xl p-12 shadow-xl border-0 max-w-lg mx-auto">
+                <div class="floating-animation mb-6">
+                    <i class="fas fa-seedling text-6xl text-indigo-400"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 font-poppins mb-4">Start Your Journey</h3>
+                <p class="text-gray-600 text-lg mb-8 leading-relaxed">Create your first habit to begin tracking your progress and building amazing routines.</p>
+                <button onclick="openAddHabitModal()" class="btn-primary text-white px-8 py-4 rounded-2xl font-semibold text-lg">
+                    🚀 Add Your First Habit
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Enhanced modal with better backdrop and styling -->
+    <div id="addHabitModal" class="fixed inset-0 modal-backdrop hidden items-center justify-center z-50">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md mx-4 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 font-poppins">Add New Habit</h3>
+                <button onclick="closeAddHabitModal()" class="text-gray-400 hover:text-gray-600 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="addHabitForm">
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Habit Name</label>
+                    <input type="text" id="habitName" class="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-all text-lg" placeholder="e.g., Drink 8 glasses of water" required>
+                </div>
+                
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Category</label>
+                    <select id="habitCategory" class="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400 transition-all text-lg">
+                        <option value="health">🏥 Health</option>
+                        <option value="fitness">💪 Fitness</option>
+                        <option value="productivity">🚀 Productivity</option>
+                        <option value="learning">📚 Learning</option>
+                        <option value="mindfulness">🧘 Mindfulness</option>
+                        <option value="other">⭐ Other</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button type="button" onclick="closeAddHabitModal()" class="flex-1 px-6 py-4 border-2 border-gray-200 text-gray-700 rounded-2xl hover:bg-gray-50 transition-all font-semibold text-lg">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 btn-primary text-white px-6 py-4 rounded-2xl font-semibold text-lg">
+                        Add Habit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Habit data storage
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+        
+        // Category icons and colors
+        const categoryConfig = {
+            health: { icon: 'fas fa-heart', color: 'text-red-500', bg: 'bg-gradient-to-r from-red-400 to-pink-400' },
+            fitness: { icon: 'fas fa-dumbbell', color: 'text-blue-500', bg: 'bg-gradient-to-r from-blue-400 to-indigo-400' },
+            productivity: { icon: 'fas fa-rocket', color: 'text-purple-500', bg: 'bg-gradient-to-r from-purple-400 to-pink-400' },
+            learning: { icon: 'fas fa-book', color: 'text-green-500', bg: 'bg-gradient-to-r from-green-400 to-teal-400' },
+            mindfulness: { icon: 'fas fa-leaf', color: 'text-teal-500', bg: 'bg-gradient-to-r from-teal-400 to-cyan-400' },
+            other: { icon: 'fas fa-star', color: 'text-yellow-500', bg: 'bg-gradient-to-r from-yellow-400 to-orange-400' }
+        };
+
+        // Initialize dashboard
+        function init() {
+            renderHabits();
+            updateStats();
+            
+            // Event listeners
+            document.getElementById('addHabitBtn').addEventListener('click', openAddHabitModal);
+            document.getElementById('addHabitForm').addEventListener('submit', addHabit);
+        }
+
+        // Render habits grid
+        function renderHabits() {
+            const habitsGrid = document.getElementById('habitsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (habits.length === 0) {
+                habitsGrid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            habitsGrid.innerHTML = habits.map(habit => {
+                const config = categoryConfig[habit.category] || categoryConfig.other;
+                const today = new Date().toDateString();
+                const isCompletedToday = habit.completedDates.includes(today);
+                const completionRate = habit.completedDates.length > 0 ? 
+                    Math.round((habit.completedDates.length / Math.max(habit.totalDays, 1)) * 100) : 0;
+                
+                return `
+                    <div class="bg-white rounded-3xl p-8 shadow-xl border-0 habit-card">
+                        <div class="flex items-start justify-between mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="${config.bg} p-4 rounded-2xl shadow-lg">
+                                    <i class="${config.icon} text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 font-poppins text-lg">${habit.name}</h3>
+                                    <p class="text-gray-500 capitalize font-medium">${habit.category}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteHabit('${habit.id}')" class="text-gray-400 hover:text-red-500 transition-colors p-2">
+                                <i class="fas fa-trash text-lg"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="flex justify-between text-sm mb-3">
+                                <span class="text-gray-500 font-semibold">Progress</span>
+                                <span class="font-bold text-gray-900">${completionRate}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="progress-bar h-3 rounded-full transition-all duration-500" style="width: ${completionRate}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-6">
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-gray-900 font-poppins">${habit.currentStreak}</p>
+                                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Day Streak</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-2xl font-bold text-gray-900 font-poppins">${habit.completedDates.length}</p>
+                                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Completed</p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="toggleHabit('${habit.id}')" 
+                                class="px-6 py-3 rounded-2xl font-semibold transition-all duration-200 ${
+                                    isCompletedToday 
+                                        ? 'btn-success text-white shadow-lg' 
+                                        : 'btn-primary text-white shadow-lg'
+                                }">
+                                <i class="fas ${isCompletedToday ? 'fa-check' : 'fa-plus'} mr-2"></i>
+                                ${isCompletedToday ? 'Done!' : 'Mark Done'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update dashboard stats
+        function updateStats() {
+            const today = new Date().toDateString();
+            const completedToday = habits.filter(habit => habit.completedDates.includes(today)).length;
+            const bestStreak = Math.max(...habits.map(habit => habit.bestStreak), 0);
+            
+            document.getElementById('totalHabits').textContent = habits.length;
+            document.getElementById('completedToday').textContent = completedToday;
+            document.getElementById('bestStreak').textContent = bestStreak;
+        }
+
+        // Modal functions
+        function openAddHabitModal() {
+            document.getElementById('addHabitModal').classList.remove('hidden');
+            document.getElementById('addHabitModal').classList.add('flex');
+        }
+
+        function closeAddHabitModal() {
+            document.getElementById('addHabitModal').classList.add('hidden');
+            document.getElementById('addHabitModal').classList.remove('flex');
+            document.getElementById('addHabitForm').reset();
+        }
+
+        // Add new habit
+        function addHabit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('habitName').value.trim();
+            const category = document.getElementById('habitCategory').value;
+            
+            if (!name) return;
+            
+            const newHabit = {
+                id: Date.now().toString(),
+                name,
+                category,
+                completedDates: [],
+                currentStreak: 0,
+                bestStreak: 0,
+                totalDays: 1,
+                createdAt: new Date().toISOString()
+            };
+            
+            habits.push(newHabit);
+            saveHabits();
+            renderHabits();
+            updateStats();
+            closeAddHabitModal();
+        }
+
+        // Toggle habit completion
+        function toggleHabit(habitId) {
+            const habit = habits.find(h => h.id === habitId);
+            if (!habit) return;
+            
+            const today = new Date().toDateString();
+            const isCompleted = habit.completedDates.includes(today);
+            
+            if (isCompleted) {
+                // Remove completion
+                habit.completedDates = habit.completedDates.filter(date => date !== today);
+                habit.currentStreak = Math.max(0, habit.currentStreak - 1);
+            } else {
+                // Add completion
+                habit.completedDates.push(today);
+                habit.currentStreak += 1;
+                habit.bestStreak = Math.max(habit.bestStreak, habit.currentStreak);
+            }
+            
+            habit.totalDays = Math.max(habit.totalDays, habit.completedDates.length);
+            
+            saveHabits();
+            renderHabits();
+            updateStats();
+        }
+
+        // Delete habit
+        function deleteHabit(habitId) {
+            if (confirm('Are you sure you want to delete this habit?')) {
+                habits = habits.filter(h => h.id !== habitId);
+                saveHabits();
+                renderHabits();
+                updateStats();
+            }
+        }
+
+        // Save habits to localStorage
+        function saveHabits() {
+            localStorage.setItem('habits', JSON.stringify(habits));
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
