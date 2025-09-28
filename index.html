@@ -1,155 +1,347 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NutriPlanner - Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriFit - Rekomendasi Menu Sehat Harian (V2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Konfigurasi Kustom Warna Tailwind */
+        .bg-primary { background-color: #10B981; } /* Hijau Emerald */
+        .text-primary { color: #10B981; }
+        .border-primary { border-color: #10B981; }
+        .bg-accent { background-color: #F97316; } /* Oranye */
+        .hover\:bg-accent\: { background-color: #EA580C; }
+        /* Style Tambahan untuk kesan modern (Glassmorphism ringan) */
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-orange-50 font-sans">
 
-  <!-- Navbar -->
-  <nav class="bg-green-600 text-white px-6 py-4 flex justify-between items-center shadow-md">
-    <h1 class="text-2xl font-bold tracking-wide">🥗 NutriPlanner</h1>
-    <ul class="flex space-x-6">
-      <li><a href="#" class="hover:text-orange-300">Beranda</a></li>
-      <li><a href="#" class="hover:text-orange-300">Rekomendasi</a></li>
-      <li><a href="#" class="hover:text-orange-300">Tentang</a></li>
-    </ul>
-  </nav>
+<body class="bg-gray-50 font-sans antialiased">
 
-  <!-- Hero Section -->
-  <section class="text-center py-20 bg-gradient-to-r from-green-500 to-orange-400 text-white shadow-md">
-    <h2 class="text-4xl font-bold mb-4">Rencanakan Menu Makan Sehatmu ✨</h2>
-    <p class="text-lg mb-6 max-w-2xl mx-auto">Pilih tujuan diet kamu, lalu biarkan sistem memberi rekomendasi sarapan, makan siang, dan makan malam yang sehat.</p>
-    <button onclick="scrollToForm()" class="px-8 py-3 bg-white text-green-700 font-semibold rounded-full shadow hover:bg-orange-100 transition">
-      Mulai Sekarang
-    </button>
-  </section>
+    <header class="sticky top-0 z-50 bg-white shadow-lg">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="#beranda" class="text-3xl font-extrabold text-primary tracking-tight">
+                Nutri<span class="text-accent">Fit</span> 🥑
+            </a>
 
-  <!-- Form Input -->
-  <section id="formSection" class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-xl -mt-10 relative z-10">
-    <h3 class="text-2xl font-semibold mb-6 text-center text-green-700">Masukkan Data Kamu</h3>
-    <form id="dietForm" class="space-y-4">
-      <div>
-        <label class="block mb-2 font-medium">Tujuan Diet</label>
-        <select id="goal" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
-          <option value="cutting">Cutting</option>
-          <option value="bulking">Bulking</option>
-          <option value="maintenance">Maintenance</option>
-        </select>
-      </div>
-      <div>
-        <label class="block mb-2 font-medium">Berat Badan (kg)</label>
-        <input type="number" id="weight" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400" required>
-      </div>
-      <div>
-        <label class="block mb-2 font-medium">Tinggi Badan (cm)</label>
-        <input type="number" id="height" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400" required>
-      </div>
-      <div>
-        <label class="block mb-2 font-medium">Usia</label>
-        <input type="number" id="age" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400" required>
-      </div>
-      <div>
-        <label class="block mb-2 font-medium">Jenis Kelamin</label>
-        <select id="gender" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
-          <option value="male">Laki-laki</option>
-          <option value="female">Perempuan</option>
-        </select>
-      </div>
-      <button type="submit" class="w-full bg-gradient-to-r from-green-600 to-orange-500 text-white py-3 rounded-lg hover:opacity-90 transition">
-        Lihat Rekomendasi
-      </button>
-    </form>
-  </section>
-
-  <!-- Hasil Rekomendasi -->
-  <section id="result" class="max-w-5xl mx-auto mt-14 hidden">
-    <div class="bg-white shadow-xl rounded-2xl p-8">
-      <h3 class="text-2xl font-bold mb-6 text-green-700">Hasil Rekomendasi 📋</h3>
-      <p id="calorieResult" class="mb-6 text-lg font-medium text-orange-600"></p>
-
-      <div class="grid md:grid-cols-3 gap-6" id="menuResult">
-        <!-- Card makanan akan muncul di sini -->
-      </div>
-    </div>
-  </section>
-
-  <script>
-    function scrollToForm() {
-      document.getElementById("formSection").scrollIntoView({ behavior: "smooth" });
-    }
-
-    const dietForm = document.getElementById("dietForm");
-    const resultSection = document.getElementById("result");
-    const calorieResult = document.getElementById("calorieResult");
-    const menuResult = document.getElementById("menuResult");
-
-    const menus = {
-      cutting: {
-        breakfast: { name: "Oatmeal + Pisang", img: "https://source.unsplash.com/400x300/?oatmeal" },
-        lunch: { name: "Nasi Merah + Ayam Panggang + Brokoli", img: "https://source.unsplash.com/400x300/?chicken,broccoli" },
-        dinner: { name: "Salad Sayur + Alpukat", img: "https://source.unsplash.com/400x300/?salad,avocado" },
-      },
-      bulking: {
-        breakfast: { name: "Telur Orak-arik + Susu Full Cream", img: "https://source.unsplash.com/400x300/?scrambledeggs,milk" },
-        lunch: { name: "Nasi Putih + Ayam Goreng + Telur Rebus", img: "https://source.unsplash.com/400x300/?rice,chicken" },
-        dinner: { name: "Steak Daging + Kentang Rebus", img: "https://source.unsplash.com/400x300/?steak,potato" },
-      },
-      maintenance: {
-        breakfast: { name: "Roti Gandum + Telur Rebus", img: "https://source.unsplash.com/400x300/?bread,egg" },
-        lunch: { name: "Nasi Putih + Ikan Panggang + Sayuran", img: "https://source.unsplash.com/400x300/?fish,vegetables" },
-        dinner: { name: "Sup Ayam + Wortel", img: "https://source.unsplash.com/400x300/?soup,chicken" },
-      },
-    };
-
-    dietForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const goal = document.getElementById("goal").value;
-      const weight = parseInt(document.getElementById("weight").value);
-      const height = parseInt(document.getElementById("height").value);
-      const age = parseInt(document.getElementById("age").value);
-      const gender = document.getElementById("gender").value;
-
-      // Hitung BMR (Mifflin-St Jeor)
-      let bmr;
-      if (gender === "male") {
-        bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-      } else {
-        bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-      }
-
-      // Asumsi aktivitas moderat (x1.55)
-      let tdee = bmr * 1.55;
-
-      if (goal === "cutting") tdee -= 500;
-      if (goal === "bulking") tdee += 500;
-
-      calorieResult.textContent = `Kebutuhan kalori harian kamu: ${Math.round(tdee)} kkal`;
-
-      // Ambil menu
-      const selectedMenus = menus[goal];
-      menuResult.innerHTML = "";
-
-      for (let [meal, data] of Object.entries(selectedMenus)) {
-        const card = `
-          <div class="bg-gray-50 rounded-xl shadow hover:shadow-lg transition overflow-hidden">
-            <img src="${data.img}" alt="${data.name}" class="w-full h-40 object-cover">
-            <div class="p-4">
-              <h4 class="text-lg font-bold capitalize text-green-700">${meal}</h4>
-              <p class="text-gray-700">${data.name}</p>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#beranda" class="text-primary font-bold border-accent pb-1">Beranda</a>
+                <a href="#rekomendasi-section" class="text-primary font-bold border-accent pb-1">Rekomendasi</a>
+                <a href="#tentang" class="text-primary font-bold border-accent pb-1">Tentang</a>
+                <a href="#login" class="px-4 py-2 bg-accent text-white rounded-full hover:opacity-90 transition duration-300 shadow-md">Login</a>
             </div>
-          </div>
-        `;
-        menuResult.innerHTML += card;
-      }
 
-      resultSection.classList.remove("hidden");
-      resultSection.scrollIntoView({ behavior: "smooth" });
-    });
-  </script>
+            <button id="mobile-menu-btn" class="md:hidden text-gray-600 hover:text-primary">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-xl py-2 px-4">
+            <a href="#beranda" class="block py-2 px-4 text-gray-700 hover:bg-gray-100">Beranda</a>
+            <a href="#rekomendasi-section" class="block py-2 px-4 text-primary font-bold bg-green-50">Rekomendasi</a>
+            <a href="#tentang" class="block py-2 px-4 text-gray-700 hover:bg-gray-100">Tentang</a>
+            <a href="#login" class="block py-2 px-4 bg-accent text-white rounded-lg mt-2 text-center">Login</a>
+        </div>
+    </header>
+    
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
+        <section id="beranda" class="mb-16 pt-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center bg-primary rounded-3xl p-10 text-white shadow-2xl">
+                <div>
+                    <h1 class="text-5xl font-extrabold leading-tight mb-4">Mulai Hidup Sehatmu Hari Ini!</h1>
+                    <p class="text-lg opacity-90 mb-6">Dapatkan rekomendasi menu makanan harian yang dipersonalisasi sesuai kebutuhan nutrisi, berat, tinggi, usia, dan tujuan diet Anda.</p>
+                    <a href="#rekomendasi-section" class="inline-block px-8 py-3 bg-accent text-white font-bold rounded-full text-lg hover:bg-orange-600 transition duration-300 shadow-xl">
+                        Cek Kebutuhan Saya →
+                    </a>
+                </div>
+                <div class="hidden lg:block">
+                     <div class="h-64 bg-white/30 rounded-2xl flex items-center justify-center p-4">
+                        <span class="text-4xl">🥦🍎🥗</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rekomendasi-section" class="pt-10">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-10 text-center">Kalkulator Nutrisi & Menu Harian</h2>
+            
+            <div class="bg-white p-6 md:p-10 rounded-xl card-shadow mb-12 border-t-8 border-accent">
+                <h3 class="text-2xl font-bold text-gray-700 mb-6">Masukkan Detail Anda</h3>
+            
+                <form id="recommendation-form" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="goal" class="block text-sm font-medium text-gray-600">Tujuan Diet</label>
+                        <select id="goal" name="goal" class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary transition duration-200" required>
+                            <option value="maintenance" selected>Maintenance (Pertahankan Berat)</option>
+                            <option value="cutting">Cutting (Turun Berat)</option>
+                            <option value="bulking">Bulking (Tambah Massa Otot)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="weight" class="block text-sm font-medium text-gray-600">Berat Badan (kg)</label>
+                        <input type="number" id="weight" name="weight" placeholder="e.g., 70" class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary transition duration-200" required min="1">
+                    </div>
+                    
+                    <div>
+                        <label for="height" class="block text-sm font-medium text-gray-600">Tinggi Badan (cm)</label>
+                        <input type="number" id="height" name="height" placeholder="e.g., 175" class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary transition duration-200" required min="100">
+                    </div>
+                    
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-600">Usia (Tahun)</label>
+                        <input type="number" id="age" name="age" placeholder="e.g., 28" class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary transition duration-200" required min="10">
+                    </div>
+
+                    <div>
+                        <label for="gender" class="block text-sm font-medium text-gray-600">Jenis Kelamin</label>
+                        <select id="gender" name="gender" class="mt-1 block w-full border border-gray-300 rounded-lg p-3 focus:ring-primary focus:border-primary transition duration-200" required>
+                            <option value="male">Pria</option>
+                            <option value="female">Wanita</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-3 flex justify-center pt-4">
+                        <button type="submit" class="w-full md:w-1/2 px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-green-700 transition duration-300 shadow-xl flex items-center justify-center text-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3 .895 3 2s-1.343 2-3 2h-4v.01M12 8V7h-4V4m8 11h-4m4 0V9m0 6h-4m4 0V9m0 6h-4m4 0V9m0 6h-4m4 0V9"></path></svg>
+                            Dapatkan Menu Terbaik Saya
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="recommendation-output" class="hidden">
+                <div class="text-center mb-8">
+                    <h3 class="text-3xl font-extrabold text-gray-800">Target Nutrisi Harian Anda</h3>
+                    <p class="text-gray-500">Berdasarkan data yang Anda masukkan.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-accent text-white p-6 rounded-xl card-shadow text-center">
+                        <p class="text-sm opacity-90">Target Kalori</p>
+                        <p id="output-calories" class="text-4xl font-extrabold mt-1">--</p>
+                        <p class="text-lg font-medium mt-1">Kkal</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-primary text-center">
+                        <p class="text-sm text-gray-500">Protein</p>
+                        <p id="output-protein" class="text-2xl font-bold text-gray-800 mt-1">-- g</p>
+                        <p class="text-xs text-primary">Pembangun Otot</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-primary text-center">
+                        <p class="text-sm text-gray-500">Karbohidrat</p>
+                        <p id="output-carbs" class="text-2xl font-bold text-gray-800 mt-1">-- g</p>
+                        <p class="text-xs text-primary">Sumber Energi</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl card-shadow border-t-4 border-primary text-center">
+                        <p class="text-sm text-gray-500">Lemak Sehat</p>
+                        <p id="output-fat" class="text-2xl font-bold text-gray-800 mt-1">-- g</p>
+                        <p class="text-xs text-primary">Fungsi Tubuh</p>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-extrabold text-gray-800 mb-6 border-l-4 border-accent pl-4">Rekomendasi Menu Harian</h3>
+
+                <div id="menu-list" class="space-y-8">
+                    
+                    <div class="menu-item bg-white rounded-xl shadow-xl overflow-hidden md:flex transition duration-300 hover:scale-[1.01] border-l-8 border-primary">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-gray-200 flex items-center justify-center p-4">
+                            <img id="meal-img-1" src="https://via.placeholder.com/400x300/FEE2E2/EF4444?text=Sarapan+Sehat" alt="Foto Sarapan" class="w-full h-full object-cover rounded-lg shadow-inner">
+                        </div>
+                        <div class="md:w-2/3 p-6 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-2xl font-bold text-primary mb-2" id="meal-time-1">SARAPAN (07:00)</h4>
+                                <p class="text-gray-600 mb-3" id="meal-desc-1"><b>Oatmeal Protein Tinggi</b>: 100g Rolled Oats, 1 Scoop Whey Protein, Buah Beri.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                <p class="text-xl font-bold text-accent" id="meal-macro-1">450 Kkal | P: 40g</p>
+                                <a href="#" class="px-4 py-1 border border-gray-300 text-gray-600 rounded-full hover:bg-gray-100 transition duration-200 text-sm">Ganti Menu</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item bg-white rounded-xl shadow-xl overflow-hidden md:flex transition duration-300 hover:scale-[1.01] border-l-8 border-primary">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-gray-200 flex items-center justify-center p-4">
+                            <img id="meal-img-2" src="https://via.placeholder.com/400x300/D1FAE5/059669?text=Makan+Siang" alt="Foto Makan Siang" class="w-full h-full object-cover rounded-lg shadow-inner">
+                        </div>
+                        <div class="md:w-2/3 p-6 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-2xl font-bold text-primary mb-2" id="meal-time-2">MAKAN SIANG (13:00)</h4>
+                                <p class="text-gray-600 mb-3" id="meal-desc-2"><b>Merah & Ayam Panggang</b> : 150g Nasi Merah, 150g Dada Ayam Panggang, Tumis Brokoli.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                <p class="text-xl font-bold text-accent" id="meal-macro-2">600 Kkal | P: 45g</p>
+                                <a href="#" class="px-4 py-1 border border-gray-300 text-gray-600 rounded-full hover:bg-gray-100 transition duration-200 text-sm">Ganti Menu</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item bg-white rounded-xl shadow-xl overflow-hidden md:flex transition duration-300 hover:scale-[1.01] border-l-8 border-primary">
+                        <div class="md:w-1/3 h-48 md:h-auto bg-gray-200 flex items-center justify-center p-4">
+                            <img id="meal-img-3" src="https://via.placeholder.com/400x300/F3E8FF/A855F7?text=Makan+Malam" alt="Foto Makan Malam" class="w-full h-full object-cover rounded-lg shadow-inner">
+                        </div>
+                        <div class="md:w-2/3 p-6 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-2xl font-bold text-primary mb-2" id="meal-time-3">MAKAN MALAM (19:00)</h4>
+                                <p class="text-gray-600 mb-3" id="meal-desc-3"><b>Salad Ikan Tuna</b>: Sayuran Hijau (Lettuce, Tomat), 1 Kaleng Tuna Rendah Garam, Minyak Zaitun.</p>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                                <p class="text-xl font-bold text-accent" id="meal-macro-3">400 Kkal | P: 35g</p>
+                                <a href="#" class="px-4 py-1 border border-gray-300 text-gray-600 rounded-full hover:bg-gray-100 transition duration-200 text-sm">Ganti Menu</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+        </section>
+
+        <section id="tentang" class="pt-20">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-10 text-center">Kenapa Memilih NutriFit?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                
+                <div class="bg-white p-8 rounded-xl card-shadow border-t-8 border-primary transform hover:shadow-2xl transition duration-300">
+                    <div class="text-5xl text-accent mb-4">🎯</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Rekomendasi Terpersonalisasi</h3>
+                    <p class="text-gray-600">Menu disusun berdasarkan data BMR, TDEE, dan tujuan diet spesifik Anda (cutting, bulking, maintenance) menggunakan formula ilmiah modern.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl card-shadow border-t-8 border-primary transform hover:shadow-2xl transition duration-300">
+                    <div class="text-5xl text-accent mb-4">🔬</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Fokus Makro & Mikro Nutrisi</h3>
+                    <p class="text-gray-600">Kami tidak hanya menghitung kalori! Menu yang direkomendasikan memiliki rasio Protein, Karbohidrat, dan Lemak Sehat yang seimbang.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl card-shadow border-t-8 border-primary transform hover:shadow-2xl transition duration-300">
+                    <div class="text-5xl text-accent mb-4">📸</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-3">Visualisasi Menu Menarik</h3>
+                    <p class="text-gray-600">Setiap rekomendasi menu dilengkapi dengan visualisasi (foto/gambar) sehingga Anda tahu persis hidangan apa yang akan Anda santap hari itu.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 NutriFit. Semua Hak Cipta Dilindungi. Dibuat dengan semangat hidup sehat.</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // Array dummy untuk URL gambar makanan
+        const mealImages = {
+            sarapan: "https://images.unsplash.com/photo-1512402120401-2a445f1b1b4d?q=80&w=150&h=112&auto=format&fit=crop", // Oatmeal/Smoothie
+            siang: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=150&h=112&auto=format&fit=crop",   // Nasi Merah & Ayam/Salmon
+            malam: "https://images.unsplash.com/photo-1505253758473-cb302c34c547?q=80&w=150&h=112&auto=format&fit=crop" // Salad/Sup
+        };
+
+        // Data dummy menu (disesuaikan agar lebih informatif)
+        const sampleMenus = {
+            cutting: {
+                sarapan: { desc: `**Oatmeal & Telur:** 50g Oats, 2 Telur Rebus, 50g Buah Beri.`, p: 30, kcal: 350, img: mealImages.sarapan },
+                siang: { desc: `**Ayam Panggang & Sayur:** 150g Dada Ayam, Brokoli Kukus, 100g Nasi Merah.`, p: 50, kcal: 450, img: mealImages.siang },
+                malam: { desc: `**Sup Ikan:** 100g Ikan Kukus, Sup Sayuran Rendah Kalori.`, p: 35, kcal: 300, img: mealImages.malam }
+            },
+            bulking: {
+                sarapan: { desc: `**Smoothie Mass:** 1 Scoop Whey, Pisang, Selai Kacang, 100g Oats.`, p: 45, kcal: 600, img: mealImages.sarapan },
+                siang: { desc: `**Nasi & Daging:** 200g Nasi Merah, 150g Daging Sapi Lada Hitam, Sayur.`, p: 60, kcal: 800, img: mealImages.siang },
+                malam: { desc: `**Kentang & Salmon:** 150g Kentang, 120g Salmon, Salad Alpukat.`, p: 40, kcal: 650, img: mealImages.malam }
+            },
+            maintenance: {
+                 sarapan: { desc: `**Roti Gandum & Alpukat:** 2 Lembar Roti Gandum, Alpukat, Telur Mata Sapi.`, p: 25, kcal: 400, img: mealImages.sarapan },
+                siang: { desc: `**Gado-Gado/Pecel Sehat:** Porsi Sedang, Bumbu Kacang Tanpa Santan.`, p: 35, kcal: 550, img: mealImages.siang },
+                malam: { desc: `**Salad Tuna:** Sayuran Hijau, Tuna Kaleng Rendah Garam, Minyak Zaitun.`, p: 30, kcal: 350, img: mealImages.malam }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('recommendation-form');
+            const output = document.getElementById('recommendation-output');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // Toggle Mobile Menu
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // 1. Ambil data dari form
+                const goal = document.getElementById('goal').value;
+                const weight = parseFloat(document.getElementById('weight').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const age = parseFloat(document.getElementById('age').value);
+                const gender = document.getElementById('gender').value;
+
+                if (!weight || !height || !age) {
+                    alert("Mohon isi semua data (Berat, Tinggi, Usia) dengan angka yang valid.");
+                    return;
+                }
+
+                // 2. Kalkulasi BMR (Mifflin-St Jeor)
+                let bmr;
+                if (gender === 'male') {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                } else {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                }
+                
+                const tdee = bmr * 1.55; 
+
+                // 3. Penyesuaian Tujuan Diet
+                let targetCalories;
+                let calorieAdjustment = 0;
+                if (goal === 'cutting') {
+                    calorieAdjustment = -500;
+                } else if (goal === 'bulking') {
+                    calorieAdjustment = 300;
+                }
+                targetCalories = Math.max(1200, Math.round(tdee + calorieAdjustment));
+
+                // 4. Kalkulasi Makro Nutrisi (P: 30%, L: 25%, K: 45%)
+                const proteinGrams = Math.round((targetCalories * 0.30) / 4);
+                const fatGrams = Math.round((targetCalories * 0.25) / 9);
+                const carbsGrams = Math.round((targetCalories * 0.45) / 4);
+
+                // 5. Update UI Output Summary
+                document.getElementById('output-calories').textContent = targetCalories.toLocaleString();
+                document.getElementById('output-protein').textContent = `${proteinGrams} g`;
+                document.getElementById('output-carbs').textContent = `${carbsGrams} g`;
+                document.getElementById('output-fat').textContent = `${fatGrams} g`;
+
+                // 6. Ambil dan Update Menu Rekomendasi berdasarkan Goal
+                const menu = sampleMenus[goal];
+
+                // Sarapan
+                document.getElementById('meal-desc-1').innerHTML = menu.sarapan.desc;
+                document.getElementById('meal-macro-1').textContent = `${menu.sarapan.kcal} Kkal | P: ${menu.sarapan.p}g`;
+                document.getElementById('meal-img-1').src = menu.sarapan.img;
+
+                // Siang
+                document.getElementById('meal-desc-2').innerHTML = menu.siang.desc;
+                document.getElementById('meal-macro-2').textContent = `${menu.siang.kcal} Kkal | P: ${menu.siang.p}g`;
+                document.getElementById('meal-img-2').src = menu.siang.img;
+
+                // Malam
+                document.getElementById('meal-desc-3').innerHTML = menu.malam.desc;
+                document.getElementById('meal-macro-3').textContent = `${menu.malam.kcal} Kkal | P: ${menu.malam.p}g`;
+                document.getElementById('meal-img-3').src = menu.malam.img;
+
+                // Tampilkan bagian output dan scroll
+                output.classList.remove('hidden');
+                output.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
 </body>
 </html>
